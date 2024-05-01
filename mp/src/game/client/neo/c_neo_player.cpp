@@ -141,8 +141,7 @@ public:
 		panel->SetControlEnabled("Button10", true);
 		panel->SetControlEnabled("Button11", true);
 		panel->SetControlEnabled("Button12", true);
-		panel->SetControlEnabled("Button13", true);
-		panel->SetControlEnabled("Button14", true);
+		panel->SetControlEnabled("ReturnButton", true);
 
 		panel->MoveToFront();
 
