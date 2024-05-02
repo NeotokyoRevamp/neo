@@ -239,7 +239,7 @@ int C_PlayerResource::GetClass(int index)
 {
 	if (!IsConnected(index))
 	{
-		return 0;
+		return -1;
 	}
 
 	return m_iClass[index];
