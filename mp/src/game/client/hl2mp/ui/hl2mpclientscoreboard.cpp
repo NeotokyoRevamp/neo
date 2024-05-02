@@ -547,12 +547,13 @@ bool CHL2MPClientScoreBoardDialog::GetPlayerScoreInfo(int playerIndex, KeyValues
 	kv->SetInt("deaths", g_PR->GetDeaths( playerIndex ));
 #ifdef NEO
 	int xp = g_PR->GetXP(playerIndex);
+	int classInt = g_PR->GetClass(playerIndex);
 	kv->SetString("rank", GetRankName(xp));
 	kv->SetInt("xp", xp);
+	kv->SetInt("class", classInt); // TEMP-TODO (nullsystem): String/named
 #else
 	kv->SetInt("frags", g_PR->GetPlayerScore(playerIndex));
 #endif
-	kv->SetString("class", "");
 	
 	if (g_PR->GetPing( playerIndex ) < 1)
 	{

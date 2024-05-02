@@ -48,6 +48,7 @@ private:
 		NEO_PING_WIDTH = 46,
 		NEO_VOICE_WIDTH =  40,
 		NEO_FRIENDS_WIDTH = 24,
+		NEO_STATUS_WIDTH = 40,
 	};
 
 	Color m_bgColor;
