@@ -90,7 +90,6 @@ bool CWeaponGrenade::Holster(CBaseCombatWeapon *pSwitchingTo)
 {
 	m_bRedraw = false;
 	m_fDrawbackFinished = false;
-	m_AttackPaused = GRENADE_PAUSED_NO;
 
 	return BaseClass::Holster(pSwitchingTo);
 }
