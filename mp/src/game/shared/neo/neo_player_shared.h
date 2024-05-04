@@ -246,4 +246,7 @@ enum NeoLeanDirectionE {
 	NEO_LEAN_LEFT,
 	NEO_LEAN_RIGHT,
 };
+
+extern ConVar neo_lean_toggle;
+
 #endif // NEO_PLAYER_SHARED_H

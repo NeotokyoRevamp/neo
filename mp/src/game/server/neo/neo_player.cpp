@@ -567,18 +567,32 @@ void CNEO_Player::CheckVisionButtons()
 
 void CNEO_Player::CheckLeanButtons()
 {
-	// TODO - cvar
-	if (1 && IsAlive())
+	if (IsAlive())
 	{
-		if (m_afButtonPressed & IN_LEAN_LEFT)
+		if (neo_lean_toggle.GetBool())
 		{
-			if (m_bInLean == NEO_LEAN_LEFT) m_bInLean = NEO_LEAN_NONE;
-			else m_bInLean = NEO_LEAN_LEFT;
+			if (m_afButtonPressed & IN_LEAN_LEFT)
+			{
+				if (m_bInLean == NEO_LEAN_LEFT) m_bInLean = NEO_LEAN_NONE;
+				else m_bInLean = NEO_LEAN_LEFT;
+			}
+			if (m_afButtonPressed & IN_LEAN_RIGHT)
+			{
+				if (m_bInLean == NEO_LEAN_RIGHT) m_bInLean = NEO_LEAN_NONE;
+				else m_bInLean = NEO_LEAN_RIGHT;
+			}
 		}
-		if (m_afButtonPressed & IN_LEAN_RIGHT)
+		else
 		{
-			if (m_bInLean == NEO_LEAN_RIGHT) m_bInLean = NEO_LEAN_NONE;
-			else m_bInLean = NEO_LEAN_RIGHT;
+			m_bInLean = NEO_LEAN_NONE;
+			if ((m_nButtons & IN_LEAN_LEFT) && !(m_nButtons & IN_LEAN_RIGHT))
+			{
+				m_bInLean = NEO_LEAN_LEFT;
+			}
+			else if ((m_nButtons & IN_LEAN_RIGHT) && !(m_nButtons & IN_LEAN_LEFT))
+			{
+				m_bInLean = NEO_LEAN_RIGHT;
+			}
 		}
 	}
 }
@@ -611,7 +625,6 @@ void CNEO_Player::PreThink(void)
 
 	CheckThermOpticButtons();
 	CheckVisionButtons();
-	CheckLeanButtons();
 
 	if (m_bInThermOpticCamo)
 	{
@@ -973,6 +986,8 @@ void CNEO_Player::PostThink(void)
 	{
 		m_bFirstDeathTick = true;
 	}
+
+	CheckLeanButtons();
 
 	auto pWep = GetActiveWeapon();
 	CNEOBaseCombatWeapon* pNeoWep = NULL;

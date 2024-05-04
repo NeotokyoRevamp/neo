@@ -158,12 +158,10 @@ public:
 	bool IsInVision() const { return m_bInVision; }
 	bool IsInAim() const { return m_bInAim; }
 
-	// NOTE (nullsystem): Only used for toggle mode, never used for hold mode
-	int InLeanDirection() const { return m_bInLean; }
-
 private:
 	void CheckThermOpticButtons();
 	void CheckVisionButtons();
+	void CheckLeanButtons();
 	void PlayCloakSound();
 
 	bool IsAllowedToSuperJump(void);
