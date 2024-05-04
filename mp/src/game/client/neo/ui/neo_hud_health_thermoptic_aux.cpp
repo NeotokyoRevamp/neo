@@ -99,8 +99,7 @@ void CNEOHud_HTA::DrawHTA() const
 	wchar_t unicodeValue_Aux[4]{ L'\0' };
 
 	const int health = player->GetHealth();
-	// FIXME/TODO (Rain): decouple ThermOptic power from AUX
-	const int thermoptic = player->m_HL2Local.m_flSuitPower;
+	const int thermoptic = player->m_HL2Local.m_cloakPower;
 	const int aux = player->m_HL2Local.m_flSuitPower;
 
 	itoa(health, value_Integrity, 10);

@@ -472,6 +472,8 @@ void CNEO_Player::Spawn(void)
 	SetNumAnimOverlays(NUM_LAYERS_WANTED);
 	ResetAnimation();
 
+	CloakPower_SetCharge(100);
+
 	m_bIsPendingSpawnForThisRound = false;
 
 	m_bLastTickInThermOpticCamo = m_bInThermOpticCamo = false;
@@ -566,6 +568,11 @@ void CNEO_Player::PreThink(void)
 {
 	BaseClass::PreThink();
 
+	if (!m_bInThermOpticCamo)
+	{
+		CloakPower_Update();
+	}
+
 	if ((!GetActiveWeapon() && IsAlive()) ||
 		// Whether or not we move backwards affects max speed
 		((m_afButtonPressed | m_afButtonReleased) & IN_BACK))
@@ -595,7 +602,7 @@ void CNEO_Player::PreThink(void)
 	{
 		if (m_flCamoAuxLastTime == 0)
 		{
-			if (SuitPower_GetCurrentPercentage() >= CLOAK_AUX_COST)
+			if (CloakPower_GetCurrentPercentage() >= CLOAK_AUX_COST)
 			{
 				m_flCamoAuxLastTime = gpGlobals->curtime;
 			}
@@ -608,13 +615,13 @@ void CNEO_Player::PreThink(void)
 				// Need to have at least this much spare AUX to enable.
 				// This prevents AUX spam abuse where player has a sliver of AUX
 				// each frame to never really run out.
-				SuitPower_Drain(deltaTime * CLOAK_AUX_COST);
+				CloakPower_Drain(deltaTime * CLOAK_AUX_COST);
 
-				if (SuitPower_GetCurrentPercentage() < CLOAK_AUX_COST)
+				if (CloakPower_GetCurrentPercentage() < CLOAK_AUX_COST)
 				{
 					m_bInThermOpticCamo = false;
 
-					SuitPower_SetCharge(0);
+					CloakPower_SetCharge(0);
 					m_flCamoAuxLastTime = 0;
 				}
 				else
@@ -824,7 +831,7 @@ void CNEO_Player::CheckThermOpticButtons()
 			return;
 		}
 
-		if (SuitPower_GetCurrentPercentage() >= CLOAK_AUX_COST)
+		if (CloakPower_GetCurrentPercentage() >= CLOAK_AUX_COST)
 		{
 			m_bInThermOpticCamo = !m_bInThermOpticCamo;
 
@@ -2214,6 +2221,102 @@ void CNEO_Player::StopWalking(void)
 {
 	SetMaxSpeed(GetNormSpeed());
 	m_fIsWalking = false;
+}
+
+static inline float GetCloakChargeRate(CBaseCombatCharacter* player)
+{
+	auto neoPlayer = static_cast<CNEO_Player*>(player);
+
+#define BASE_CLOAK_RATE (10.0f)
+
+	switch (neoPlayer->GetClass())
+	{
+	case NEO_CLASS_RECON:
+		return BASE_CLOAK_RATE * 1.2f;
+	case NEO_CLASS_ASSAULT:
+		return BASE_CLOAK_RATE;
+	case NEO_CLASS_SUPPORT:
+		return BASE_CLOAK_RATE * 0.8f;
+	default:
+		return BASE_CLOAK_RATE;
+	}
+}
+
+void CNEO_Player::CloakPower_Update(void)
+{
+	if (CloakPower_ShouldRecharge())
+	{
+		CloakPower_Charge(GetCloakChargeRate(this) * gpGlobals->frametime);
+	}
+}
+
+bool CNEO_Player::CloakPower_Drain(float flPower)
+{
+	m_HL2Local.m_cloakPower -= flPower;
+
+	if (m_HL2Local.m_cloakPower < 0.0)
+	{
+		// Power is depleted!
+		// Clamp and fail
+		m_HL2Local.m_cloakPower = 0.0;
+		return false;
+	}
+
+	return true;
+}
+
+void CNEO_Player::CloakPower_Charge(float flPower)
+{
+	m_HL2Local.m_cloakPower += flPower;
+
+	if (m_HL2Local.m_cloakPower > 100.0)
+	{
+		// Full charge, clamp.
+		m_HL2Local.m_cloakPower = 100.0;
+	}
+}
+
+#define CLOAKPOWER_BEGIN_RECHARGE_DELAY	0.5f
+bool CNEO_Player::CloakPower_ShouldRecharge(void)
+{
+	// Make sure all devices are off.
+	if (m_HL2Local.m_bitsActiveDevices != 0x00000000)
+	{
+		if (static_cast<CNEO_Player*>(this)->GetClass() == NEO_CLASS_RECON)
+		{
+			// Is the system fully charged?
+			if (m_HL2Local.m_cloakPower >= 100.0f)
+			{
+				return false;
+			}
+
+			// Has the system been in a no-load state for long enough
+			// to begin recharging?
+#if 0 // TODO (nullsystem)
+			if (gpGlobals->curtime < m_flTimeAllSuitDevicesOff + CLOAKPOWER_BEGIN_RECHARGE_DELAY)
+			{
+				return false;
+			}
+#endif
+
+			// Recons are allowed to recharge AUX whilst sprinting
+			return ((m_HL2Local.m_bitsActiveDevices & ~bits_SUIT_DEVICE_SPRINT) == 0);
+		}
+		return false;
+	}
+
+	// Is the system fully charged?
+	if (m_HL2Local.m_cloakPower >= 100.0f)
+		return false;
+
+#if 0 // TODO (nullsystem)
+	// Has the system been in a no-load state for long enough
+	// to begin recharging?
+	if (gpGlobals->curtime < m_flTimeAllSuitDevicesOff + CLOAKPOWER_BEGIN_RECHARGE_DELAY)
+		return false;
+#endif 
+
+	return true;
 }
 
 float CNEO_Player::GetCrouchSpeed_WithActiveWepEncumberment(void) const
