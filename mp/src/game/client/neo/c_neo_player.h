@@ -158,6 +158,9 @@ public:
 	bool IsInVision() const { return m_bInVision; }
 	bool IsInAim() const { return m_bInAim; }
 
+	// NOTE (nullsystem): Only used for toggle mode, never used for hold mode
+	int InLeanDirection() const { return m_bInLean; }
+
 private:
 	void CheckThermOpticButtons();
 	void CheckVisionButtons();
@@ -193,6 +196,7 @@ public:
 	CNetworkVar(bool, m_bLastTickInThermOpticCamo);
 	CNetworkVar(bool, m_bInVision);
 	CNetworkVar(bool, m_bInAim);
+	CNetworkVar(int, m_bInLean);
 
 	CNetworkVar(int, m_iNeoClass);
 	CNetworkVar(int, m_iNeoSkin);

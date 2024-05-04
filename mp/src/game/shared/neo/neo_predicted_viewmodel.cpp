@@ -132,6 +132,7 @@ ConVar neo_lean_yaw_peek_right_amount("neo_lean_yaw_peek_right_amount", "15.0", 
 ConVar neo_lean_angle_percentage("neo_lean_angle_percentage", "0.75", FCVAR_REPLICATED | FCVAR_CHEAT, "for adjusting the actual angle of lean to a percentage of lean.", true, 0.0, true, 1.0);
 ConVar neo_lean_tp_exaggerate_scale("neo_lean_tp_exaggerate_scale", "2", FCVAR_REPLICATED | FCVAR_CHEAT, "How much more to scale leaning motion in 3rd person animation vs 1st person viewmodel.", true, 0.0, false, 0);
 ConVar neo_lean_fp_lower_eyes_scale("neo_lean_fp_lower_eyes_scale", "2.333", FCVAR_REPLICATED | FCVAR_CHEAT, "Multiplier for how low to bring eye-level (and hence bullet line level) whilst leaning.", true, 0.0, false, 0);
+ConVar neo_lean_toggle("neo_lean_toggle", "0", FCVAR_REPLICATED | FCVAR_USERINFO, "Set leaning to toggle-mode.", true, 0.0f, true, 1.0f);
 
 #if(0)
 ConVar neo_lean_thirdperson_roll_lerp_scale("neo_lean_thirdperson_roll_lerp_scale", "5",
@@ -254,16 +255,45 @@ float CNEOPredictedViewModel::lean(CNEO_Player *player){
 	const int leanButtons = player->m_nButtons;
 	if (player->IsAlive())
 	{
-		if ((leanButtons & IN_LEAN_LEFT) && !(leanButtons & IN_LEAN_RIGHT)) {
-			//leaning left
-			Yfinal = freeRoomForLean(neo_lean_yaw_peek_left_amount.GetFloat(), player);
+#if 0
+		int				m_afButtonPressed;
+		int				m_afButtonReleased;
+
+		if (neo_lean_toggle.GetBool())
+#else
+		if (1)
+#endif
+		{
+			// Toggle-lean
+			if (player->m_bInLean == NEO_LEAN_LEFT)
+			{
+				//leaning left
+				Yfinal = freeRoomForLean(neo_lean_yaw_peek_left_amount.GetFloat(), player);
+			}
+			else if (player->m_bInLean == NEO_LEAN_RIGHT)
+			{
+				//leaning right
+				Yfinal = -freeRoomForLean(-neo_lean_yaw_peek_right_amount.GetFloat(), player);
+			}
+			else
+			{
+				//not leaning, or leaning both ways; move towards zero
+			}
 		}
-		else if ((leanButtons & IN_LEAN_RIGHT) && !(leanButtons & IN_LEAN_LEFT)) {
-			//leaning right
-			Yfinal = -freeRoomForLean(-neo_lean_yaw_peek_right_amount.GetFloat(), player);
-		}
-		else {
-			//not leaning, or leaning both ways; move towards zero
+		else
+		{
+			// Hold-lean
+			if ((leanButtons & IN_LEAN_LEFT) && !(leanButtons & IN_LEAN_RIGHT)) {
+				//leaning left
+				Yfinal = freeRoomForLean(neo_lean_yaw_peek_left_amount.GetFloat(), player);
+			}
+			else if ((leanButtons & IN_LEAN_RIGHT) && !(leanButtons & IN_LEAN_LEFT)) {
+				//leaning right
+				Yfinal = -freeRoomForLean(-neo_lean_yaw_peek_right_amount.GetFloat(), player);
+			}
+			else {
+				//not leaning, or leaning both ways; move towards zero
+			}
 		}
 	}
 
