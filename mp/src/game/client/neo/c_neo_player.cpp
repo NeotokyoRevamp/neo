@@ -328,6 +328,7 @@ C_NEO_Player::C_NEO_Player()
 	m_bInThermOpticCamo = m_bInVision = false;
 	m_bHasBeenAirborneForTooLongToSuperJump = false;
 	m_bInAim = false;
+	m_bInLean = NEO_LEAN_NONE;
 
 	m_pNeoPanel = NULL;
 
@@ -415,7 +416,7 @@ void C_NEO_Player::CheckLeanButtons()
 {
 	if (IsAlive())
 	{
-		if (neo_lean_toggle.GetBool())
+		if (ClientWantsLeanToggle(this))
 		{
 			if (m_afButtonPressed & IN_LEAN_LEFT)
 			{
@@ -1004,6 +1005,7 @@ void C_NEO_Player::Spawn( void )
 
 	m_bInVision = false;
 	m_nVisionLastTick = 0;
+	m_bInLean = NEO_LEAN_NONE;
 
 	Weapon_SetZoom(false);
 

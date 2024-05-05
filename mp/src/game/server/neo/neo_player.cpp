@@ -482,6 +482,7 @@ void CNEO_Player::Spawn(void)
 
 	m_bInVision = false;
 	m_nVisionLastTick = 0;
+	m_bInLean = NEO_LEAN_NONE;
 
 	Weapon_SetZoom(false);
 
@@ -569,7 +570,7 @@ void CNEO_Player::CheckLeanButtons()
 {
 	if (IsAlive())
 	{
-		if (neo_lean_toggle.GetBool())
+		if (ClientWantsLeanToggle(this))
 		{
 			if (m_afButtonPressed & IN_LEAN_LEFT)
 			{

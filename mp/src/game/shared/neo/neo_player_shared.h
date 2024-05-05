@@ -247,6 +247,6 @@ enum NeoLeanDirectionE {
 	NEO_LEAN_RIGHT,
 };
 
-extern ConVar neo_lean_toggle;
+bool ClientWantsLeanToggle(const CNEO_Player* player);
 
 #endif // NEO_PLAYER_SHARED_H
