@@ -472,7 +472,7 @@ void CNEO_Player::Spawn(void)
 	SetNumAnimOverlays(NUM_LAYERS_WANTED);
 	ResetAnimation();
 
-	CloakPower_SetCharge(100);
+	m_HL2Local.m_cloakPower = CloakPower_Cap();
 
 	m_bIsPendingSpawnForThisRound = false;
 
@@ -602,7 +602,7 @@ void CNEO_Player::PreThink(void)
 	{
 		if (m_flCamoAuxLastTime == 0)
 		{
-			if (CloakPower_GetCurrentPercentage() >= CLOAK_AUX_COST)
+			if (m_HL2Local.m_cloakPower >= CLOAK_AUX_COST)
 			{
 				m_flCamoAuxLastTime = gpGlobals->curtime;
 			}
@@ -617,11 +617,11 @@ void CNEO_Player::PreThink(void)
 				// each frame to never really run out.
 				CloakPower_Drain(deltaTime * CLOAK_AUX_COST);
 
-				if (CloakPower_GetCurrentPercentage() < CLOAK_AUX_COST)
+				if (m_HL2Local.m_cloakPower < CLOAK_AUX_COST)
 				{
 					m_bInThermOpticCamo = false;
 
-					CloakPower_SetCharge(0);
+					m_HL2Local.m_cloakPower = 0.0f;
 					m_flCamoAuxLastTime = 0;
 				}
 				else
@@ -831,7 +831,7 @@ void CNEO_Player::CheckThermOpticButtons()
 			return;
 		}
 
-		if (CloakPower_GetCurrentPercentage() >= CLOAK_AUX_COST)
+		if (m_HL2Local.m_cloakPower >= CLOAK_AUX_COST)
 		{
 			m_bInThermOpticCamo = !m_bInThermOpticCamo;
 
@@ -2223,30 +2223,23 @@ void CNEO_Player::StopWalking(void)
 	m_fIsWalking = false;
 }
 
-static inline float GetCloakChargeRate(CBaseCombatCharacter* player)
-{
-	auto neoPlayer = static_cast<CNEO_Player*>(player);
-
-#define BASE_CLOAK_RATE (10.0f)
-
-	switch (neoPlayer->GetClass())
-	{
-	case NEO_CLASS_RECON:
-		return BASE_CLOAK_RATE * 1.2f;
-	case NEO_CLASS_ASSAULT:
-		return BASE_CLOAK_RATE;
-	case NEO_CLASS_SUPPORT:
-		return BASE_CLOAK_RATE * 0.8f;
-	default:
-		return BASE_CLOAK_RATE;
-	}
-}
-
 void CNEO_Player::CloakPower_Update(void)
 {
-	if (CloakPower_ShouldRecharge())
+	if (m_HL2Local.m_cloakPower < CloakPower_Cap())
 	{
-		CloakPower_Charge(GetCloakChargeRate(this) * gpGlobals->frametime);
+		float chargeRate = 0.0f;
+		switch (GetClass())
+		{
+		case NEO_CLASS_RECON:
+			chargeRate = 0.55f;
+			break;
+		case NEO_CLASS_ASSAULT:
+			chargeRate = 0.25f;
+			break;
+		default:
+			break;
+		}
+		CloakPower_Charge(chargeRate * gpGlobals->frametime);
 	}
 }
 
@@ -2256,8 +2249,7 @@ bool CNEO_Player::CloakPower_Drain(float flPower)
 
 	if (m_HL2Local.m_cloakPower < 0.0)
 	{
-		// Power is depleted!
-		// Clamp and fail
+		// Camo is depleted: clamp and fail
 		m_HL2Local.m_cloakPower = 0.0;
 		return false;
 	}
@@ -2269,54 +2261,26 @@ void CNEO_Player::CloakPower_Charge(float flPower)
 {
 	m_HL2Local.m_cloakPower += flPower;
 
-	if (m_HL2Local.m_cloakPower > 100.0)
+	const float cloakCap = CloakPower_Cap();
+	if (m_HL2Local.m_cloakPower > cloakCap)
 	{
 		// Full charge, clamp.
-		m_HL2Local.m_cloakPower = 100.0;
+		m_HL2Local.m_cloakPower = cloakCap;
 	}
 }
 
-#define CLOAKPOWER_BEGIN_RECHARGE_DELAY	0.5f
-bool CNEO_Player::CloakPower_ShouldRecharge(void)
+float CNEO_Player::CloakPower_Cap() const
 {
-	// Make sure all devices are off.
-	if (m_HL2Local.m_bitsActiveDevices != 0x00000000)
+	switch (GetClass())
 	{
-		if (static_cast<CNEO_Player*>(this)->GetClass() == NEO_CLASS_RECON)
-		{
-			// Is the system fully charged?
-			if (m_HL2Local.m_cloakPower >= 100.0f)
-			{
-				return false;
-			}
-
-			// Has the system been in a no-load state for long enough
-			// to begin recharging?
-#if 0 // TODO (nullsystem)
-			if (gpGlobals->curtime < m_flTimeAllSuitDevicesOff + CLOAKPOWER_BEGIN_RECHARGE_DELAY)
-			{
-				return false;
-			}
-#endif
-
-			// Recons are allowed to recharge AUX whilst sprinting
-			return ((m_HL2Local.m_bitsActiveDevices & ~bits_SUIT_DEVICE_SPRINT) == 0);
-		}
-		return false;
+	case NEO_CLASS_RECON:
+		return 13.0f;
+	case NEO_CLASS_ASSAULT:
+		return 8.0f;
+	default:
+		break;
 	}
-
-	// Is the system fully charged?
-	if (m_HL2Local.m_cloakPower >= 100.0f)
-		return false;
-
-#if 0 // TODO (nullsystem)
-	// Has the system been in a no-load state for long enough
-	// to begin recharging?
-	if (gpGlobals->curtime < m_flTimeAllSuitDevicesOff + CLOAKPOWER_BEGIN_RECHARGE_DELAY)
-		return false;
-#endif 
-
-	return true;
+	return 0.0f;
 }
 
 float CNEO_Player::GetCrouchSpeed_WithActiveWepEncumberment(void) const
