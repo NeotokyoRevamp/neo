@@ -247,6 +247,6 @@ enum NeoWeponAimToggleE {
 	NEO_TOGGLE_FORCE_UN_AIM,
 };
 
-extern ConVar cl_aimhold;
+extern ConVar neo_aim_hold;
 
 #endif // NEO_PLAYER_SHARED_H

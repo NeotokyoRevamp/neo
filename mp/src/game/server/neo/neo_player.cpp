@@ -973,14 +973,14 @@ void CNEO_Player::PostThink(void)
 			{
 				static_cast<CWeaponGrenade*>(pNeoWep)->SecondaryAttack();
 			}
-			else if (cl_aimhold.GetBool())
+			else if (neo_aim_hold.GetBool())
 			{
 				Weapon_AimToggle(pWep, NEO_TOGGLE_FORCE_AIM);
 			}
 		}
 		else if (m_afButtonReleased & IN_AIM)
 		{
-			Weapon_AimToggle(pWep, cl_aimhold.GetBool() ? NEO_TOGGLE_FORCE_UN_AIM : NEO_TOGGLE_DEFAULT);
+			Weapon_AimToggle(pWep, neo_aim_hold.GetBool() ? NEO_TOGGLE_FORCE_UN_AIM : NEO_TOGGLE_DEFAULT);
 		}
 		m_bPreviouslyReloading = pWep->m_bInReload;
 

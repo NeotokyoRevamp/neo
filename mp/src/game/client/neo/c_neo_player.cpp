@@ -888,13 +888,13 @@ void C_NEO_Player::PostThink(void)
 		{
 			Weapon_SetZoom(false);
 		}
-		else if (cl_aimhold.GetBool() && m_afButtonPressed & IN_AIM)
+		else if (neo_aim_hold.GetBool() && m_afButtonPressed & IN_AIM)
 		{
 			Weapon_AimToggle(pWep, NEO_TOGGLE_FORCE_AIM);
 		}
 		else if ((m_afButtonReleased & IN_AIM) && (!(m_nButtons & IN_SPEED)))
 		{
-			Weapon_AimToggle(pWep, cl_aimhold.GetBool() ? NEO_TOGGLE_FORCE_UN_AIM : NEO_TOGGLE_DEFAULT);
+			Weapon_AimToggle(pWep, neo_aim_hold.GetBool() ? NEO_TOGGLE_FORCE_UN_AIM : NEO_TOGGLE_DEFAULT);
 		}
 
 #if !defined( NO_ENTITY_PREDICTION )
