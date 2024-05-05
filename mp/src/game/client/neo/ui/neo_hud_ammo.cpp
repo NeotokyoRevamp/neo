@@ -19,8 +19,6 @@
 #include "ammodef.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <algorithm>
-
 #include "weapon_grenade.h"
 #include "weapon_neobasecombatweapon.h"
 #include "weapon_smokegrenade.h"
