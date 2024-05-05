@@ -124,7 +124,7 @@ void CNEOHud_Ammo::DrawAmmo() const
 	}
 
 	const Color textColor = COLOR_WHITE;
-	auto textColorTransparent = *new Color(textColor.r(), textColor.g(), textColor.b(), 127);
+	auto textColorTransparent = Color(textColor.r(), textColor.g(), textColor.b(), 127);
 
 	const size_t maxWepnameLen = 64;
 	char wepName[maxWepnameLen]{ '\0' };
