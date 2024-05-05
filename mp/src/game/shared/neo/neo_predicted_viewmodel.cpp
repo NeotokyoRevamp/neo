@@ -253,7 +253,7 @@ float CNEOPredictedViewModel::lean(CNEO_Player *player){
 
 	if (player->IsAlive())
 	{
-		switch (player->m_bInLean)
+		switch (player->m_bInLean.Get())
 		{
 		case NEO_LEAN_LEFT:
 			Yfinal = freeRoomForLean(neo_lean_yaw_peek_left_amount.GetFloat(), player);
