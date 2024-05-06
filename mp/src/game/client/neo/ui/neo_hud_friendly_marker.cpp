@@ -88,6 +88,7 @@ void CNEOHud_FriendlyMarker::UpdateStateForNeoHudElementDraw()
 		if ((localPlayer->entindex() == i + 1) || // Skip self
 			(localPlayer->m_rvFriendlyPlayerPositions[i] == vec3_origin)) // Skip unused positions
 		{
+			m_x0[i] = m_x1[i] = m_y0[i] = m_y1[i] = 0;
 			continue;
 		}
 
