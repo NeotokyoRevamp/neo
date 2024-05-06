@@ -1326,6 +1326,42 @@ void CNEORules::PlayerKilled(CBasePlayer *pVictim, const CTakeDamageInfo &info)
 		{
 			attacker->m_iXP.GetForModify() += 1;
 		}
+
+		// Check for assistance (> 50 dmg, not final attacker)
+		const int attackerIdx = attacker->entindex();
+		for (int assistIdx = 1; assistIdx <= gpGlobals->maxClients; ++assistIdx)
+		{
+			static const float MIN_DMG_QUALIFY_ASSIST = 50.0f;
+
+			const float assistDmg = victim->GetAttackersScores(assistIdx);
+			if (assistDmg >= MIN_DMG_QUALIFY_ASSIST)
+			{
+				if (assistIdx == attackerIdx)
+				{
+					// Break early, there's no assists
+					break;
+				}
+
+				auto assister = static_cast<CNEO_Player*>(UTIL_PlayerByIndex(assistIdx));
+				if (!assister)
+				{
+					// Unlikely, but just in-case
+					break;
+				}
+
+				// Team kill assist
+				if (assister->GetTeamNumber() == victim->GetTeamNumber())
+				{
+					assister->m_iXP.GetForModify() -= 1;
+				}
+				// Enemy kill assist
+				else
+				{
+					assister->m_iXP.GetForModify() += 1;
+				}
+				break;
+			}
+		}
 	}
 }
 

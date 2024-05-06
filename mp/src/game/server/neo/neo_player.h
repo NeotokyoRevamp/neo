@@ -63,6 +63,7 @@ public:
 	virtual void EquipSuit(bool bPlayEffects = true) OVERRIDE;
 	virtual void RemoveSuit(void) OVERRIDE;
 	virtual void GiveDefaultItems(void) OVERRIDE;
+	virtual int	OnTakeDamage_Alive(const CTakeDamageInfo& info) OVERRIDE;
 
 	virtual void InitVCollision(const Vector& vecAbsOrigin, const Vector& vecAbsVelocity) OVERRIDE;
 
@@ -160,6 +161,8 @@ public:
 	float GetWalkSpeed(void) const;
 	float GetSprintSpeed(void) const;
 
+	float GetAttackersScores(const int attackerIdx) const;
+
 	IMPLEMENT_NETWORK_VAR_FOR_DERIVED(m_EyeAngleOffset);
 
 private:
@@ -202,6 +205,7 @@ public:
 	CNetworkVar(int, m_nVisionLastTick);
 
 	CNetworkArray(Vector, m_rvFriendlyPlayerPositions, MAX_PLAYERS);
+	CNetworkArray(float, m_rfAttackersScores, (MAX_PLAYERS + 1));
 
 	CNetworkVar(unsigned char, m_NeoFlags);
 
