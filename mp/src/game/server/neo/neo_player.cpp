@@ -60,6 +60,7 @@ SendPropBool(SENDINFO(m_bInVision)),
 SendPropBool(SENDINFO(m_bHasBeenAirborneForTooLongToSuperJump)),
 SendPropBool(SENDINFO(m_bShowTestMessage)),
 SendPropBool(SENDINFO(m_bInAim)),
+SendPropBool(SENDINFO(m_bDroppedAnything)),
 
 SendPropTime(SENDINFO(m_flCamoAuxLastTime)),
 SendPropInt(SENDINFO(m_nVisionLastTick)),
@@ -81,6 +82,7 @@ DEFINE_FIELD(m_iXP, FIELD_INTEGER),
 DEFINE_FIELD(m_iCapTeam, FIELD_INTEGER),
 DEFINE_FIELD(m_iGhosterTeam, FIELD_INTEGER),
 DEFINE_FIELD(m_iLoadoutWepChoice, FIELD_INTEGER),
+DEFINE_FIELD(m_bDroppedAnything, FIELD_BOOLEAN),
 DEFINE_FIELD(m_iNextSpawnClassChoice, FIELD_INTEGER),
 
 DEFINE_FIELD(m_bGhostExists, FIELD_BOOLEAN),
@@ -104,6 +106,7 @@ DEFINE_FIELD(m_NeoFlags, FIELD_CHARACTER),
 END_DATADESC()
 
 CBaseEntity *g_pLastJinraiSpawn, *g_pLastNSFSpawn;
+CNEOGameRulesProxy* neoGameRules;
 extern CBaseEntity *g_pLastSpawn;
 
 extern ConVar neo_sv_ignore_wep_xp_limit;
@@ -119,7 +122,7 @@ void CNEO_Player::RequestSetClass(int newClass)
 		return;
 	}
 
-	if (IsDead() || sv_neo_can_change_classes_anytime.GetBool())
+	if (IsDead() || sv_neo_can_change_classes_anytime.GetBool() || (!m_bDroppedAnything && NEORules()->GetRemainingPreRoundFreezeTime(false) > 0))
 	{
 		m_iNeoClass = newClass;
 		m_iNextSpawnClassChoice = -1;
@@ -127,6 +130,8 @@ void CNEO_Player::RequestSetClass(int newClass)
 		SetPlayerTeamModel();
 		SetViewOffset(VEC_VIEW_NEOSCALE(this));
 		InitSprinting();
+		RemoveAllItems(false);
+		GiveDefaultItems();
 	}
 	else
 	{
@@ -247,6 +252,7 @@ bool CNEO_Player::RequestSetLoadout(int loadoutNumber)
 	if (result)
 	{
 		m_iLoadoutWepChoice = loadoutNumber;
+		GiveLoadoutWeapon();
 	}
 	
 	if (pEnt != NULL && !(pEnt->IsMarkedForDeletion()))
@@ -2054,7 +2060,7 @@ void CNEO_Player::GiveDefaultItems(void)
 
 void CNEO_Player::GiveLoadoutWeapon(void)
 {
-	if (IsObserver() || IsDead())
+	if (IsObserver() || IsDead() || m_bDroppedAnything || ((NEORules()->GetRemainingPreRoundFreezeTime(false)) < 0))
 	{
 		return;
 	}
@@ -2095,6 +2101,8 @@ void CNEO_Player::GiveLoadoutWeapon(void)
 
 			if (pEnt != NULL && !(pEnt->IsMarkedForDeletion()))
 			{
+				RemoveAllItems(false);
+				GiveDefaultItems();
 				pEnt->Touch(this);
 				Weapon_Switch(Weapon_OwnsThisType(szWep));
 			}

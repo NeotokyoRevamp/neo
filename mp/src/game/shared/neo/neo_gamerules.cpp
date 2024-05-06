@@ -785,6 +785,7 @@ void CNEORules::StartNextRound()
 		pPlayer->m_bInAim = false;
 		pPlayer->m_bInThermOpticCamo = false;
 		pPlayer->m_bInVision = false;
+		pPlayer->m_bDroppedAnything = false;
 
 		pPlayer->SetTestMessageVisible(false);
 	}
