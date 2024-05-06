@@ -434,6 +434,7 @@ void CNEO_Player::UpdateNetworkedFriendlyLocations()
 			|| (engine->CheckOriginInPVS(otherPlayer->GetAbsOrigin(), pvs, pvsSize)))
 #endif
 		{
+			m_rvFriendlyPlayerPositions.Set(i, Vector(0,0,0));
 			continue;
 		}
 
