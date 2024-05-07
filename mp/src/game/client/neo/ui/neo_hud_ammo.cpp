@@ -234,7 +234,7 @@ void CNEOHud_Ammo::DrawAmmo() const
 			}			
 		}
 
-		auto maxSpaceAvaliableForBullets = (xPos1 - (margin + clipsTextWidth)) - (xPos0 + fireModeWidth + (margin * 2));
+		auto maxSpaceAvaliableForBullets = (xPos1 - (margin + max(clipsTextWidth, m_fontWidth))) - (xPos0 + fireModeWidth + (margin * 2));
 		auto bulletWidth = surface()->GetCharacterWidth(m_hBulletFont, *ammoChar);
 		auto plusWidth = surface()->GetCharacterWidth(m_hBulletFont, '+');
 		auto maxBulletsWeCanDisplay = maxSpaceAvaliableForBullets / bulletWidth;
