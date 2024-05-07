@@ -75,6 +75,7 @@ IMPLEMENT_CLIENTCLASS_DT(C_NEO_Player, DT_NEO_Player, CNEO_Player)
 	RecvPropBool(RECVINFO(m_bInVision)),
 	RecvPropBool(RECVINFO(m_bHasBeenAirborneForTooLongToSuperJump)),
 	RecvPropBool(RECVINFO(m_bInAim)),
+	RecvPropBool(RECVINFO(m_bDroppedAnything)),
 
 	RecvPropTime(RECVINFO(m_flCamoAuxLastTime)),
 	RecvPropInt(RECVINFO(m_nVisionLastTick)),
@@ -122,22 +123,13 @@ public:
 			return;
 		}
 
+		panel->SetProportional(false); // Fixes wrong menu size when in windowed mode, regardless of whether proportional is set to false in the res file (NEOWTF)
 		panel->ApplySchemeSettings(vgui::scheme()->GetIScheme(panel->GetScheme()));
 
-		int panelWide = 960, panelTall = 700, screenWide, screenTall;
-		surface()->GetScreenSize(screenWide, screenTall);
-		// Resize panel, but make sure it fits the resolution.
-		panel->SetSize(Min(screenWide, panelWide), Min(screenTall, panelTall));
-		panel->SetPos((screenWide / 2) - (panelWide / 2),
-			(screenTall / 2) - (panelTall / 2));
-
 		panel->SetMouseInputEnabled(true);
-		panel->SetKeyBoardInputEnabled(true);
+		//panel->SetKeyBoardInputEnabled(true);
 		panel->SetCursorAlwaysVisible(true);
 
-		panel->SetControlEnabled("Scout_Button", true);
-		panel->SetControlEnabled("Misc2", true);
-		panel->SetControlEnabled("Done_Button", true);
 		panel->SetControlEnabled("Button1", true);
 		panel->SetControlEnabled("Button2", true);
 		panel->SetControlEnabled("Button3", true);
@@ -150,8 +142,7 @@ public:
 		panel->SetControlEnabled("Button10", true);
 		panel->SetControlEnabled("Button11", true);
 		panel->SetControlEnabled("Button12", true);
-		panel->SetControlEnabled("Button13", true);
-		panel->SetControlEnabled("Button14", true);
+		panel->SetControlEnabled("ReturnButton", true);
 
 		panel->MoveToFront();
 
@@ -193,18 +184,11 @@ public:
 			Warning("Couldn't find class panel\n");
 			return;
 		}
-
+		panel->SetProportional(false);
 		panel->ApplySchemeSettings(vgui::scheme()->GetIScheme(panel->GetScheme()));
 
-		int panelWide = 650, panelTall = 280, screenWide, screenTall;
-		surface()->GetScreenSize(screenWide, screenTall);
-		// Resize panel, but make sure it fits the resolution.
-		panel->SetSize(Min(screenWide, panelWide), Min(screenTall, panelTall));
-		panel->SetPos((screenWide / 2) - (panelWide / 2),
-			(screenTall / 2) - (panelTall / 2));
-
 		panel->SetMouseInputEnabled(true);
-		panel->SetKeyBoardInputEnabled(true);
+		//panel->SetKeyBoardInputEnabled(true);
 		panel->SetCursorAlwaysVisible(true);
 
 		panel->SetControlEnabled("Scout_Button", true);
@@ -248,18 +232,11 @@ public:
 			return;
 		}
 
+		panel->SetProportional(false);
 		panel->ApplySchemeSettings(vgui::scheme()->GetIScheme(panel->GetScheme()));
 
-		int panelWide = 360, panelTall = 215, screenWide, screenTall;
-		panelWide *= 1.5; panelTall *= 1.5;
-		surface()->GetScreenSize(screenWide, screenTall);
-		// Resize panel, but make sure it fits the resolution.
-		panel->SetSize(Min(screenWide, panelWide), Min(screenTall, panelTall));
-		panel->SetPos((screenWide / 2) - (panelWide / 2),
-			(screenTall / 2) - (panelTall / 2));
-
 		panel->SetMouseInputEnabled(true);
-		panel->SetKeyBoardInputEnabled(true);
+		//panel->SetKeyBoardInputEnabled(true);
 		panel->SetCursorAlwaysVisible(true);
 
 		panel->SetControlEnabled("jinraibutton", true);
@@ -326,6 +303,7 @@ C_NEO_Player::C_NEO_Player()
 	m_bInThermOpticCamo = m_bInVision = false;
 	m_bHasBeenAirborneForTooLongToSuperJump = false;
 	m_bInAim = false;
+	m_bDroppedAnything = false;
 
 	m_pNeoPanel = NULL;
 
@@ -1033,6 +1011,7 @@ bool C_NEO_Player::ShouldDrawHL2StyleQuickHud(void)
 
 void C_NEO_Player::Weapon_Drop(C_NEOBaseCombatWeapon *pWeapon)
 {
+	m_bDroppedAnything = true;
 	Weapon_SetZoom(false);
 
 	if (pWeapon->IsGhost())

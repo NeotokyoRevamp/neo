@@ -590,6 +590,9 @@ void CNEORules::FireGameEvent(IGameEvent* event)
 
 	if (Q_strcmp(type, "round_start") == 0)
 	{
+#ifdef CLIENT_DLL
+		engine->ClientCmd("classmenu");
+#endif
 		m_flNeoRoundStartTime = gpGlobals->curtime;
 		m_flNeoNextRoundStartTime = 0;
 	}
@@ -785,6 +788,7 @@ void CNEORules::StartNextRound()
 		pPlayer->m_bInAim = false;
 		pPlayer->m_bInThermOpticCamo = false;
 		pPlayer->m_bInVision = false;
+		pPlayer->m_bDroppedAnything = false;
 
 		pPlayer->SetTestMessageVisible(false);
 	}
