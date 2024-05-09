@@ -36,12 +36,14 @@ BEGIN_NETWORK_TABLE_NOBASE( CNEORules, DT_NEORules )
 	RecvPropInt(RECVINFO(m_nRoundStatus)),
 	RecvPropInt(RECVINFO(m_iRoundNumber)),
 	RecvPropInt(RECVINFO(m_iGhosterTeam)),
+	RecvPropInt(RECVINFO(m_iGhosterPlayer)),
 #else
 	SendPropFloat(SENDINFO(m_flNeoNextRoundStartTime)),
 	SendPropFloat(SENDINFO(m_flNeoRoundStartTime)),
 	SendPropInt(SENDINFO(m_nRoundStatus)),
 	SendPropInt(SENDINFO(m_iRoundNumber)),
 	SendPropInt(SENDINFO(m_iGhosterTeam)),
+	SendPropInt(SENDINFO(m_iGhosterPlayer)),
 #endif
 END_NETWORK_TABLE()
 
@@ -240,6 +242,7 @@ CNEORules::CNEORules()
 	SetRoundStatus(NeoRoundStatus::Idle);
 	m_iRoundNumber = 0;
 	m_iGhosterTeam = TEAM_UNASSIGNED;
+	m_iGhosterPlayer = 0;
 
 	ListenForGameEvent("round_start");
 }
@@ -359,6 +362,7 @@ void CNEORules::ChangeLevel(void)
 	SetRoundStatus(NeoRoundStatus::Idle);
 	m_iRoundNumber = 0;
 	m_iGhosterTeam = TEAM_UNASSIGNED;
+	m_iGhosterPlayer = 0;
 	m_flNeoRoundStartTime = 0;
 	m_flNeoNextRoundStartTime = 0;
 
@@ -376,6 +380,7 @@ bool CNEORules::CheckGameOver(void)
 		SetRoundStatus(NeoRoundStatus::Idle);
 		m_iRoundNumber = 0;
 		m_iGhosterTeam = TEAM_UNASSIGNED;
+		m_iGhosterPlayer = 0;
 		m_flNeoRoundStartTime = 0;
 		m_flNeoNextRoundStartTime = 0;
 	}
@@ -461,17 +466,20 @@ void CNEORules::Think(void)
 
 	// Update ghosting team info
 	int nextGhosterTeam = TEAM_UNASSIGNED;
+	int nextGhosterPlayer = 0;
 	for (int i = 1; i <= gpGlobals->maxClients; i++)
 	{
 		auto player = static_cast<CNEO_Player*>(UTIL_PlayerByIndex(i));
 		if (player && player->IsCarryingGhost())
 		{
 			nextGhosterTeam = player->GetTeamNumber();
+			nextGhosterPlayer = i;
 			Assert(nextGhosterTeam == TEAM_JINRAI || nextGhosterTeam == TEAM_NSF);
 			break;
 		}
 	}
 	m_iGhosterTeam = nextGhosterTeam;
+	m_iGhosterPlayer = nextGhosterPlayer;
 
 	// Check if the ghost was capped during this Think
 	int captorTeam, captorClient;

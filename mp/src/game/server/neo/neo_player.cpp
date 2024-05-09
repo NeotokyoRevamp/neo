@@ -713,7 +713,21 @@ void CNEO_Player::PreThink(void)
 
 		if (ghost->GetAbsOrigin().IsValid())
 		{
-			m_vecGhostMarkerPos = ghost->GetAbsOrigin();
+			Vector vecNextGhostMarkerPos = ghost->GetAbsOrigin();
+			const int ghosterTeam = NEORules()->ghosterTeam();
+			if (ghosterTeam == TEAM_JINRAI || ghosterTeam == TEAM_NSF)
+			{
+				// Someone's carrying it, center at their body
+				const int playerIdx = NEORules()->GetGhosterPlayer();
+				if (auto player = static_cast<CNEO_Player*>(UTIL_PlayerByIndex(playerIdx)))
+				{
+					const Vector playerEye = player->EyePosition();
+					const Vector playerBase = player->GetAbsOrigin();
+					const float playerMidZ = (playerEye.z - playerBase.z) / 2.0f;
+					vecNextGhostMarkerPos = Vector(playerBase.x, playerBase.y, playerBase.z + playerMidZ);
+				}
+			}
+			m_vecGhostMarkerPos = vecNextGhostMarkerPos;
 		}
 		else
 		{
