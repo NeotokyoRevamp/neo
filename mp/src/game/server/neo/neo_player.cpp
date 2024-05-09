@@ -47,7 +47,6 @@ SendPropInt(SENDINFO(m_iNeoSkin)),
 SendPropInt(SENDINFO(m_iNeoStar)),
 SendPropInt(SENDINFO(m_iXP)),
 SendPropInt(SENDINFO(m_iCapTeam), 3),
-SendPropInt(SENDINFO(m_iGhosterTeam)),
 SendPropInt(SENDINFO(m_iLoadoutWepChoice)),
 SendPropInt(SENDINFO(m_iNextSpawnClassChoice)),
 
@@ -77,7 +76,6 @@ DEFINE_FIELD(m_iNeoSkin, FIELD_INTEGER),
 DEFINE_FIELD(m_iNeoStar, FIELD_INTEGER),
 DEFINE_FIELD(m_iXP, FIELD_INTEGER),
 DEFINE_FIELD(m_iCapTeam, FIELD_INTEGER),
-DEFINE_FIELD(m_iGhosterTeam, FIELD_INTEGER),
 DEFINE_FIELD(m_iLoadoutWepChoice, FIELD_INTEGER),
 DEFINE_FIELD(m_iNextSpawnClassChoice, FIELD_INTEGER),
 
@@ -359,7 +357,6 @@ CNEO_Player::CNEO_Player()
 	m_bInAim = false;
 
 	m_iCapTeam = TEAM_UNASSIGNED;
-	m_iGhosterTeam = TEAM_UNASSIGNED;
 	m_iLoadoutWepChoice = 0;
 	m_iNextSpawnClassChoice = -1;
 
@@ -716,7 +713,21 @@ void CNEO_Player::PreThink(void)
 
 		if (ghost->GetAbsOrigin().IsValid())
 		{
-			m_vecGhostMarkerPos = ghost->GetAbsOrigin();
+			Vector vecNextGhostMarkerPos = ghost->GetAbsOrigin();
+			const int ghosterTeam = NEORules()->ghosterTeam();
+			if (ghosterTeam == TEAM_JINRAI || ghosterTeam == TEAM_NSF)
+			{
+				// Someone's carrying it, center at their body
+				const int playerIdx = NEORules()->GetGhosterPlayer();
+				if (auto player = static_cast<CNEO_Player*>(UTIL_PlayerByIndex(playerIdx)))
+				{
+					const Vector playerEye = player->EyePosition();
+					const Vector playerBase = player->GetAbsOrigin();
+					const float playerMidZ = (playerEye.z - playerBase.z) / 2.0f;
+					vecNextGhostMarkerPos = Vector(playerBase.x, playerBase.y, playerBase.z + playerMidZ);
+				}
+			}
+			m_vecGhostMarkerPos = vecNextGhostMarkerPos;
 		}
 		else
 		{
