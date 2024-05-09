@@ -759,9 +759,7 @@ void C_NEO_Player::PreThink( void )
 				const float distance = METERS_PER_INCH *
 					GetAbsOrigin().DistTo(m_vecGhostMarkerPos);
 
-				// NEO HACK (Rain): We should test if we're holding a ghost
-				// instead of relying on a distance check.
-				if (m_iGhosterTeam != GetTeamNumber() || distance > 0.2)
+				if (!IsCarryingGhost())
 				{
 					ghostMarker->SetVisible(true);
 
@@ -769,9 +767,8 @@ void C_NEO_Player::PreThink( void )
 					GetVectorInScreenSpace(m_vecGhostMarkerPos, ghostMarkerX, ghostMarkerY);
 
 					ghostMarker->SetScreenPosition(ghostMarkerX, ghostMarkerY);
-					ghostMarker->SetGhostingTeam(m_iGhosterTeam);
-
-
+					ghostMarker->SetGhostingTeam(NEORules()->ghosterTeam());
+					ghostMarker->SetClientCurrentTeam(GetTeamNumber());
 					ghostMarker->SetGhostDistance(distance);
 				}
 				else

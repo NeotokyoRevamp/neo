@@ -208,6 +208,8 @@ public:
 		NEO_VICTORY_STALEMATE // Not actually a victory
 	};
 
+	int ghosterTeam() const { return m_iGhosterTeam; }
+
 	int GetOpposingTeam(const int team) const
 	{
 		if (team == TEAM_JINRAI) { return TEAM_NSF; }
@@ -239,6 +241,7 @@ private:
 #endif
 	CNetworkVar(int, m_nRoundStatus); // NEO TODO (Rain): probably don't need to network this
 	CNetworkVar(int, m_iRoundNumber);
+	CNetworkVar(int, m_iGhosterTeam);
 
 	CNetworkVar(float, m_flNeoRoundStartTime);
 	CNetworkVar(float, m_flNeoNextRoundStartTime);
