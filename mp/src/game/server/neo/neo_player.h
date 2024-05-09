@@ -190,7 +190,6 @@ public:
 	CNetworkString(m_pszTestMessage, 32 * 2 + 1);
 
 	CNetworkVector(m_vecGhostMarkerPos);
-	CNetworkVar(int, m_iGhosterTeam);
 	CNetworkVar(bool, m_bGhostExists);
 	CNetworkVar(bool, m_bInThermOpticCamo);
 	CNetworkVar(bool, m_bLastTickInThermOpticCamo);

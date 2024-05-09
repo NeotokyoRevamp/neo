@@ -187,8 +187,6 @@ public:
 
 	CNetworkVector(m_vecGhostMarkerPos);
 
-	CNetworkVar(int, m_iGhosterTeam); // TODO (nullsystem): Remove? Never used/replaced by gamerules
-
 	CNetworkVar(bool, m_bInThermOpticCamo);
 	CNetworkVar(bool, m_bLastTickInThermOpticCamo);
 	CNetworkVar(bool, m_bInVision);

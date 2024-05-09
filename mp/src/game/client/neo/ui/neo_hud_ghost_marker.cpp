@@ -128,6 +128,8 @@ void CNEOHud_GhostMarker::DrawNeoHudElement()
 
 void CNEOHud_GhostMarker::Paint()
 {
+	SetFgColor(COLOR_TRANSPARENT);
+	SetBgColor(COLOR_TRANSPARENT);
 	BaseClass::Paint();
 	PaintNeoElement();
 }
