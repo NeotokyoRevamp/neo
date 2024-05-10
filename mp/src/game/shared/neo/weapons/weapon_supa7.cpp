@@ -530,3 +530,15 @@ void CWeaponSupa7::AddViewKick(void)
 	punch.Init(SharedRandomFloat("supapax", -2, -1), SharedRandomFloat("supapay", -1, 1), 0);
 	pPlayer->ViewPunch(punch);
 }
+
+bool C_WeaponSupa7::SlugLoaded() const
+{
+	return m_bSlugLoaded;
+}
+
+
+bool C_WeaponSupa7::SlugLoaded() const
+{
+	return m_bSlugLoaded;
+}
+
