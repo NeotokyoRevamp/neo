@@ -18,11 +18,13 @@
 
 #include "ammodef.h"
 
-// memdbgon must be the last include file in a .cpp file!!!
+#include "weapon_ghost.h"
 #include "weapon_grenade.h"
 #include "weapon_neobasecombatweapon.h"
 #include "weapon_smokegrenade.h"
 #include "weapon_supa7.h"
+
+// memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 NEO_HUD_ELEMENT_DECLARE_FREQ_CVAR(Ammo, 0.00695);
@@ -155,6 +157,11 @@ void CNEOHud_Ammo::DrawAmmo() const
 	surface()->GetTextSize(m_hSmallTextFont, unicodeWepName, weaponNamePixelWidth, weaponNamePixelHeight);
 	surface()->DrawSetTextPos(xPos1 - ((margin * 2) + weaponNamePixelWidth + m_fontWidth / 2), yPos0 + (margin / 2));
 	surface()->DrawPrintText(unicodeWepName, textLen);
+
+	if(dynamic_cast<C_WeaponGhost*> (activeWep))
+	{
+		return;
+	}
 
 	const int maxClip = activeWep->GetMaxClip1();
 	if (maxClip != 0 && !activeWep->IsMeleeWeapon())
