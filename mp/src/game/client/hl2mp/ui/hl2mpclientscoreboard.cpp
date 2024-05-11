@@ -562,10 +562,14 @@ bool CHL2MPClientScoreBoardDialog::GetPlayerScoreInfo(int playerIndex, KeyValues
 	kv->SetString("rank", GetRankName(xp));
 	kv->SetInt("xp", xp);
 
+	CBasePlayer* player = C_BasePlayer::GetLocalPlayer();
+	const int playerNeoTeam = player->GetTeamNumber();
+	const bool oppositeTeam = (playerNeoTeam == TEAM_JINRAI || playerNeoTeam == TEAM_NSF) && (neoTeam != playerNeoTeam);
+
 	const char* statusText = "";
 	if (neoTeam == TEAM_JINRAI || neoTeam == TEAM_NSF)
 	{
-		statusText = g_PR->IsAlive(playerIndex) ? "Alive" : "Dead";
+		statusText = (oppositeTeam || g_PR->IsAlive(playerIndex)) ? "" : "Dead";
 	}
 	kv->SetString("status", statusText);
 #else
