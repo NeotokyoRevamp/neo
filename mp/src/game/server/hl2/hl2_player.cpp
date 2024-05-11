@@ -1229,7 +1229,11 @@ void CHL2_Player::StartAutoSprint()
 //-----------------------------------------------------------------------------
 void CHL2_Player::StartSprinting( void )
 {
-	if( m_HL2Local.m_flSuitPower < 10 )
+#ifndef NEO
+	if ( m_HL2Local.m_flSuitPower < 10 )
+#else
+	if (m_HL2Local.m_flSuitPower < SPRINT_START_MIN)
+#endif
 	{
 #ifndef NEO
 		// debounce the button for sound playing

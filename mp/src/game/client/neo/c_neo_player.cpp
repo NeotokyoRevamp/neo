@@ -1063,7 +1063,7 @@ void C_NEO_Player::Weapon_Drop(C_NEOBaseCombatWeapon *pWeapon)
 
 void C_NEO_Player::StartSprinting(void)
 {
-	if (m_HL2Local.m_flSuitPower < 10)
+	if (m_HL2Local.m_flSuitPower < SPRINT_START_MIN)
 	{
 		return;
 	}

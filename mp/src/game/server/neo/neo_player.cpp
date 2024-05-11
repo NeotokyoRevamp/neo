@@ -2165,7 +2165,7 @@ void CNEO_Player::StartAutoSprint(void)
 
 void CNEO_Player::StartSprinting(void)
 {
-	if (GetClass() != NEO_CLASS_RECON && m_HL2Local.m_flSuitPower < 10)
+	if (GetClass() != NEO_CLASS_RECON && m_HL2Local.m_flSuitPower < SPRINT_START_MIN)
 	{
 		return;
 	}
