@@ -106,16 +106,6 @@ void CNEOScoreBoard::UpdatePlayerInfo()
 				m_pPlayerList->ModifyItem(itemId, sectionId, playerData);
 			}
 
-#if 0		// NOTE (nullsystem): Don't highlight for now
-			// Highlight the row if this is the local player
-			if (player && i == player->entindex())
-			{
-				Assert(itemId != -1);
-				m_pPlayerList->SetSelectedItem(itemId);
-				//m_pPlayerList->SetFgColor(test);
-			}
-#endif
-
 			playerData->deleteThis();
 		}
 		// We have itemId for unconnected player, remove it
@@ -175,7 +165,6 @@ void CNEOScoreBoard::ApplySchemeSettings(vgui::IScheme *pScheme)
 #define ADD_COL(sectionId, columnName, columnText, columnFlags, width, fallbackFont) \
 	m_pPlayerList->AddColumnToSection(sectionId, columnName, columnText, columnFlags, \
 	scheme()->GetProportionalScaledValueEx(GetScheme(), width), fallbackFont)
-#define COL_RIGHT SectionedListPanel::COLUMN_RIGHT
 #define COL_IMAGE SectionedListPanel::COLUMN_IMAGE
 
 void CNEOScoreBoard::AddHeader()
@@ -186,11 +175,12 @@ void CNEOScoreBoard::AddHeader()
 	m_pPlayerList->AddSection(0, "");
 	m_pPlayerList->SetSectionAlwaysVisible(0);
 	ADD_COL(0, "name", "", 0, NEO_NAME_WIDTH, hFallbackFont);
-	ADD_COL(0, "class", "", 0, NEO_CLASS_WIDTH, hFallbackFont);
-	ADD_COL(0, "rank", "Rank", COL_RIGHT, NEO_NAME_WIDTH / 4, hFallbackFont);
-	ADD_COL(0, "xp", "XP", COL_RIGHT, NEO_SCORE_WIDTH, hFallbackFont);
-	ADD_COL(0, "deaths", "#PlayerDeath", COL_RIGHT, NEO_DEATH_WIDTH, hFallbackFont);
-	ADD_COL(0, "ping", "#PlayerPing", COL_RIGHT, NEO_PING_WIDTH, hFallbackFont);
+	ADD_COL(0, "rank", "Rank", 0, NEO_NAME_WIDTH / 4, hFallbackFont);
+	ADD_COL(0, "class", "Class", 0, NEO_CLASS_WIDTH, hFallbackFont);
+	ADD_COL(0, "xp", "XP", 0, NEO_SCORE_WIDTH, hFallbackFont);
+	ADD_COL(0, "deaths", "#PlayerDeath", 0, NEO_DEATH_WIDTH, hFallbackFont);
+	ADD_COL(0, "ping", "Ping", 0, NEO_PING_WIDTH, hFallbackFont);
+	ADD_COL(0, "status", "Status", 0, NEO_STATUS_WIDTH, hFallbackFont);
 	//ADD_COL(0, "voice", "#PlayerVoice", COL_IMAGE, NEO_VOICE_WIDTH, hFallbackFont);
 	//ADD_COL(0, "tracker", "#PlayerTracker", COL_IMAGE, NEO_FRIENDS_WIDTH, hFallbackFont);
 }
@@ -208,12 +198,12 @@ void CNEOScoreBoard::AddSection(int teamType, int teamNumber)
 	if (teamType == TYPE_TEAM)
 	{
 		ADD_COL(sectionID, "name", "", 0, NEO_NAME_WIDTH, hFallbackFont);
-		ADD_COL(sectionID, "class", "", COL_RIGHT, NEO_CLASS_WIDTH, hFallbackFont);
-		ADD_COL(sectionID, "rank", "", COL_RIGHT, NEO_NAME_WIDTH / 4, hFallbackFont);
-		ADD_COL(sectionID, "xp", "", COL_RIGHT, NEO_SCORE_WIDTH, hFallbackFont);
-		ADD_COL(sectionID, "deaths", "", COL_RIGHT, NEO_DEATH_WIDTH, hFallbackFont);
-		ADD_COL(sectionID, "ping", "", COL_RIGHT, NEO_PING_WIDTH, hFallbackFont);
-		ADD_COL(sectionID, "status", "", COL_RIGHT, NEO_STATUS_WIDTH, hFallbackFont);
+		ADD_COL(sectionID, "rank", "", 0, NEO_NAME_WIDTH / 4, hFallbackFont);
+		ADD_COL(sectionID, "class", "", 0, NEO_CLASS_WIDTH, hFallbackFont);
+		ADD_COL(sectionID, "xp", "", 0, NEO_SCORE_WIDTH, hFallbackFont);
+		ADD_COL(sectionID, "deaths", "", 0, NEO_DEATH_WIDTH, hFallbackFont);
+		ADD_COL(sectionID, "ping", "", 0, NEO_PING_WIDTH, hFallbackFont);
+		ADD_COL(sectionID, "status", "", 0, NEO_STATUS_WIDTH, hFallbackFont);
 	}
 	else if (teamType == TYPE_SPECTATORS)
 	{
