@@ -612,16 +612,14 @@ void CNEO_Player::PreThink(void)
 			const float deltaTime = gpGlobals->curtime - m_flCamoAuxLastTime;
 			if (deltaTime >= 1)
 			{
-				// Need to have at least this much spare AUX to enable.
-				// This prevents AUX spam abuse where player has a sliver of AUX
+				// Need to have at least this much spare camo to enable.
+				// This prevents camo spam abuse where player has a sliver of camo
 				// each frame to never really run out.
 				CloakPower_Drain(deltaTime * CLOAK_AUX_COST);
 
-				if (m_HL2Local.m_cloakPower < CLOAK_AUX_COST)
+				if (m_HL2Local.m_cloakPower <= 0.1f)
 				{
 					m_bInThermOpticCamo = false;
-
-					m_HL2Local.m_cloakPower = 0.0f;
 					m_flCamoAuxLastTime = 0;
 				}
 				else
