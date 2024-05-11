@@ -550,7 +550,12 @@ bool CHL2MPClientScoreBoardDialog::GetPlayerScoreInfo(int playerIndex, KeyValues
 	const int neoClassIdx = g_PR->GetClass(playerIndex);
 	kv->SetString("rank", GetRankName(xp));
 	kv->SetInt("xp", xp);
-	kv->SetString("class", GetNeoClassName(neoClassIdx));
+
+	CBasePlayer* player = C_BasePlayer::GetLocalPlayer();
+	const int playerNeoTeam = player->GetTeamNumber();
+	const bool oppositeTeam = (playerNeoTeam == TEAM_JINRAI || playerNeoTeam == TEAM_NSF) && (neoTeam != playerNeoTeam);
+
+	kv->SetString("class", oppositeTeam ? "" : GetNeoClassName(neoClassIdx));
 #else
 	kv->SetInt("frags", g_PR->GetPlayerScore(playerIndex));
 #endif
