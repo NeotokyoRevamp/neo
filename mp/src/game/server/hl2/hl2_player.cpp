@@ -419,23 +419,22 @@ static inline float GetAuxChargeRate(CBaseCombatCharacter *player)
 {
 	auto neoPlayer = static_cast<CNEO_Player*>(player);
 
-#define BASE_AUX_RATE 10.0
-
 	switch (neoPlayer->GetClass())
 	{
 	case NEO_CLASS_RECON:
-		return BASE_AUX_RATE * 1.2;
+		return 5.0f;	// 100 units in 20 seconds
 	case NEO_CLASS_ASSAULT:
-		return BASE_AUX_RATE;
-	case NEO_CLASS_SUPPORT:
-		return BASE_AUX_RATE * 0.8;
+		return 2.5f;	// 100 units in 40 seconds
 	default:
-		return BASE_AUX_RATE;
+		break;
 	}
+	return 0.0f;
 }
 #endif
 
-#ifdef HL2MP
+#if defined(NEO)
+	CSuitPowerDevice SuitDeviceSprint( bits_SUIT_DEVICE_SPRINT, 5.0f );					// 100 units in 20 seconds
+#elif defined(HL2MP)
 	CSuitPowerDevice SuitDeviceSprint( bits_SUIT_DEVICE_SPRINT, 25.0f );				// 100 units in 4 seconds
 #else
 	CSuitPowerDevice SuitDeviceSprint( bits_SUIT_DEVICE_SPRINT, 12.5f );				// 100 units in 8 seconds
