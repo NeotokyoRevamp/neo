@@ -390,6 +390,24 @@ void CNEORules::Think(void)
 		return;
 	}
 
+#if 0	// TODO (nullsystem): Allow respawn if it also respawns with menu
+	if (m_nRoundStatus == NeoRoundStatus::Idle || m_nRoundStatus == NeoRoundStatus::Warmup)
+	{
+		for (int i = 1; i <= gpGlobals->maxClients; i++)
+		{
+			auto player = static_cast<CNEO_Player*>(UTIL_PlayerByIndex(i));
+			if (player && player->IsDead())
+			{
+				const int playerTeam = player->GetTeamNumber();
+				if (playerTeam == TEAM_JINRAI || playerTeam == TEAM_NSF)
+				{
+					respawn(player, false);
+				}
+			}
+		}
+	}
+#endif
+
 	if (g_fGameOver)   // someone else quit the game already
 	{
 		// check to see if we should change levels now
@@ -750,7 +768,6 @@ void CNEORules::StartNextRound()
 	{
 		UTIL_CenterPrintAll("Waiting for players on both teams.\n"); // NEO TODO (Rain): actual message
 		SetRoundStatus(NeoRoundStatus::Idle);
-		m_flNeoRoundStartTime = FLT_MAX;
 		m_flNeoNextRoundStartTime = gpGlobals->curtime + 10.0f;
 		return;
 	}
@@ -795,6 +812,10 @@ void CNEORules::StartNextRound()
 
 	CleanUpMap();
 
+	// TODO (nullsystem): There should be a more sophisticated logic to be able to restore XP
+	// for when moving from idle to preroundfreeze, or in the future, competitive with whatever
+	// extra stuff in there. But to keep it simple: just clear if it was a warmup.
+	const bool clearXP = (m_nRoundStatus == NeoRoundStatus::Warmup);
 	SetRoundStatus(NeoRoundStatus::PreRoundFreeze);
 
 	char RoundMsg[11];
@@ -826,6 +847,12 @@ void CNEORules::StartNextRound()
 		pPlayer->m_bInAim = false;
 		pPlayer->m_bInThermOpticCamo = false;
 		pPlayer->m_bInVision = false;
+
+		if (clearXP)
+		{
+			pPlayer->Reset();
+			pPlayer->m_iXP.Set(0);
+		}
 
 		pPlayer->SetTestMessageVisible(false);
 	}
@@ -1637,7 +1664,7 @@ bool CNEORules::FPlayerCanRespawn(CBasePlayer* pPlayer)
 
 	if (jinrai && nsf)
 	{
-		if (jinrai->GetNumPlayers() == 0 || nsf->GetNumPlayers() == 0)
+		if (m_nRoundStatus == NeoRoundStatus::Warmup || m_nRoundStatus == NeoRoundStatus::Idle)
 		{
 			return true;
 		}
