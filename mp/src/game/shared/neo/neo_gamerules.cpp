@@ -22,7 +22,8 @@
 	#include "inetchannelinfo.h"
 #endif
 
-#define NEO_WARMUP_TIME_SECS (45.0f)
+ConVar mp_neo_loopback_warmup_round("mp_neo_loopback_warmup_round", "0", FCVAR_REPLICATED, "Allow loopback server to do warmup rounds.", true, 0.0f, true, 1.0f);
+ConVar mp_neo_warmup_round_time("mp_neo_warmup_round_time", "45", FCVAR_REPLICATED, "The warmup round time, in seconds.", true, 0.0f, false, 0.0f);
 ConVar mp_neo_preround_freeze_time("mp_neo_preround_freeze_time", "10", FCVAR_REPLICATED, "The pre-round freeze time, in seconds.", true, 0.0, false, 0);
 ConVar mp_neo_latespawn_max_time("mp_neo_latespawn_max_time", "15", FCVAR_REPLICATED, "How many seconds late are players still allowed to spawn.", true, 0.0, false, 0);
 
@@ -584,7 +585,7 @@ float CNEORules::GetRoundRemainingTime()
 		return 0;
 	}
 
-	const float roundTimeLimit = (m_nRoundStatus == NeoRoundStatus::Warmup) ? NEO_WARMUP_TIME_SECS : (neo_round_timelimit.GetFloat() * 60.0f);
+	const float roundTimeLimit = (m_nRoundStatus == NeoRoundStatus::Warmup) ? (mp_neo_warmup_round_time.GetFloat()) : (neo_round_timelimit.GetFloat() * 60.0f);
 	return (m_flNeoRoundStartTime + roundTimeLimit) - gpGlobals->curtime;
 }
 
@@ -757,31 +758,34 @@ void CNEORules::StartNextRound()
 	if (m_nRoundStatus == NeoRoundStatus::Idle)
 	{
 		// NOTE (nullsystem): If it's a loopback server, then go straight in. Mostly ease for testing other stuff.
-		bool isLoopback = false;
-		for (int i = 1; i <= gpGlobals->maxClients; i++)
+		bool loopbackSkipWarmup = false;
+		if (!mp_neo_loopback_warmup_round.GetBool())
 		{
-			if (auto* pPlayer = static_cast<CNEO_Player*>(UTIL_PlayerByIndex(i)))
+			for (int i = 1; i <= gpGlobals->maxClients; i++)
 			{
-				const int teamNum = pPlayer->GetTeamNumber();
-				if (!pPlayer->IsBot() && (teamNum == TEAM_JINRAI || teamNum == TEAM_NSF))
+				if (auto* pPlayer = static_cast<CNEO_Player*>(UTIL_PlayerByIndex(i)))
 				{
-					INetChannelInfo* nci = engine->GetPlayerNetInfo(i);
-					isLoopback = nci->IsLoopback();
-					if (!isLoopback)
+					const int teamNum = pPlayer->GetTeamNumber();
+					if (!pPlayer->IsBot() && (teamNum == TEAM_JINRAI || teamNum == TEAM_NSF))
 					{
-						break;
+						INetChannelInfo* nci = engine->GetPlayerNetInfo(i);
+						loopbackSkipWarmup = nci->IsLoopback();
+						if (!loopbackSkipWarmup)
+						{
+							break;
+						}
 					}
 				}
 			}
 		}
 
-		if (!isLoopback)
+		if (!loopbackSkipWarmup)
 		{
 			// Moving from 0 players from either team to playable at team state
 			UTIL_CenterPrintAll("Warmup countdown started.\n");
 			SetRoundStatus(NeoRoundStatus::Warmup);
 			m_flNeoRoundStartTime = gpGlobals->curtime;
-			m_flNeoNextRoundStartTime = gpGlobals->curtime + NEO_WARMUP_TIME_SECS;
+			m_flNeoNextRoundStartTime = gpGlobals->curtime + mp_neo_warmup_round_time.GetFloat();
 			return;
 		}
 	}
