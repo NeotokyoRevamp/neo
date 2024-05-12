@@ -1301,6 +1301,12 @@ void CNEORules::SetWinningTeam(int team, int iWinReason, bool bForceMapReset, bo
 // but blame the structure of the base classes
 static CNEO_Player* FetchAssists(CNEO_Player* attacker, CNEO_Player* victim)
 {
+	// Non-CNEO_Player, return NULL
+	if (!attacker || !victim)
+	{
+		return NULL;
+	}
+
 	// Check for assistance (> 50 dmg, not final attacker)
 	const int attackerIdx = attacker->entindex();
 	for (int assistIdx = 1; assistIdx <= gpGlobals->maxClients; ++assistIdx)
