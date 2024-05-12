@@ -54,6 +54,8 @@ END_DATADESC()
 
 PRECACHE_WEAPON_REGISTER(weapon_ghost);
 
+ConVar neo_ghost_delay_secs("neo_ghost_delay_secs", "2.35", FCVAR_CHEAT | FCVAR_REPLICATED, "The delay in seconds until the ghost shows up after pick up. Note, the timing isn't exact.", true, 0.0, false, 0.0);
+
 CWeaponGhost::CWeaponGhost(void)
 {
 #ifdef CLIENT_DLL
@@ -61,6 +63,7 @@ CWeaponGhost::CWeaponGhost(void)
 	m_bHaveHolsteredTheGhost = false;
 
 	m_flLastGhostBeepTime = 0;
+	m_flNextAllowGhostShowTime = 0;
 
 	for (int i = 0; i < ARRAYSIZE(m_pGhostBeacons); i++)
 	{
@@ -133,6 +136,7 @@ void CWeaponGhost::HandleGhostEquip(void)
 {
 	if (!m_bHavePlayedGhostEquipSound)
 	{
+		m_flNextAllowGhostShowTime = gpGlobals->curtime + neo_ghost_delay_secs.GetFloat();
 		PlayGhostSound();
 		m_bHavePlayedGhostEquipSound = true;
 		m_bHaveHolsteredTheGhost = false;
@@ -246,11 +250,20 @@ float CWeaponGhost::ShowEnemies(void)
 		return 0;
 	}
 
+	const bool showGhost = (gpGlobals->curtime > m_flNextAllowGhostShowTime);
 	float closestDistance = 1000;
 
 	for (int i = 1; i <= gpGlobals->maxClients; i++)
 	{
 		HideBeacon(i);
+
+		if (!showGhost)
+		{
+			// Just hide beacons
+			// TODO (nullsystem): Once the refactor goes in, that set 0 to the visible beacon bitmasks
+			// straight away and instead just skip this loop entirely
+			continue;
+		}
 
 		auto otherPlayer = ToBasePlayer( ClientEntityList().GetEnt( i ) );
 
